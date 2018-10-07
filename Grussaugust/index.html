@@ -6,16 +6,29 @@
 		<script src="libs/react.js"></script>
 		<script src="libs/react-dom.js"></script>
 		<script src="libs/browser.min.js"></script> 
+
+		<style>
+			.valid {
+				background-color: #a5d6a7;
+			}
+
+			.invalid {
+				background-color: #ffcdd2;
+			}
+
+
+		</style>
 	</head>
 	<body>
 		<div id="mountPoint"> </div>
+	
 	</body>
 
 	<script type="text/babel">
 		class Greeter extends React.Component {
 
-			constructor() {
-				super();
+			constructor(props) {
+				super(props);
 				this.state = {greeting: ''}
 			}
 
@@ -25,21 +38,41 @@
 
 			onGreetingClicked() {
 				alert(`Hello, ${this.state.greeting}`);
+				this.setState({greeting: ''});
+				
+				if(this.inputField) {
+					this.inputField.focus();
+				}
+			}
+
+
+			getCharsRemaining() {
+				return (this.props.maxLength - this.state.greeting.length);
+			}
+
+			isGreetingValid() {
+				return this.state.greeting.length > 0 && this.getCharsRemaining() >= 0;
+			}
+
+			hasRemainingChars() {
+				return this.getCharsRemaining() > 0;
 			}
 
 
 			render() {
+				const greetingValid = this.isGreetingValid();
 				return (
 					<div>
 						Greeting: 
-						<input value={this.state.greeting} onChange={(e)=>this.onGreetingChange(e)}></input>
-						<button onClick={()=>this.onGreetingClicked()}>Greet</button>
+						<input className={greetingValid?'valid':'invalid'} value={this.state.greeting} onChange={(e)=>this.onGreetingChange(e)} ref={(c) => this.inputField = c}></input>
+						<span style={{color:this.hasRemainingChars()?'green':'red'}}>Remaining characters: {this.getCharsRemaining()} </span>
+						<button disabled={!greetingValid} onClick={()=>this.onGreetingClicked()}>Greet</button>
 					</div>
 				);
 			}
 		}
 
-		ReactDOM.render(<Greeter />, document.getElementById('mountPoint'));	
+		ReactDOM.render(<Greeter maxLength={25}/>, document.getElementById('mountPoint'));	
 	</script>
 </html>
 
